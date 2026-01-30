@@ -4,26 +4,42 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
 
-export const GetStartedButton = () => {
+interface GetStartedButtonProps {
+  text?: string;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+  className?: string;
+  showWelcomeMessage?: boolean;
+  unauthenticatedHref?: string;
+}
+
+export const GetStartedButton = ({
+  text = "Get Started",
+  variant = "default",
+  size = "lg",
+  showWelcomeMessage = true,
+  className,
+  unauthenticatedHref = "/auth/register",
+}: GetStartedButtonProps = {}) => {
   const { data: session, isPending } = useSession();
 
   if (isPending) {
     return (
-      <Button size="lg" className="opacity-50" asChild>
-        <span>Get Started</span>
+      <Button size={size} variant={variant} className={`opacity-50 ${className || ""}`} asChild>
+        <span>{text}</span>
       </Button>
     );
   }
 
-  const href = session ? "/profile" : "/auth/login";
+  const href = session ? "/profile" : unauthenticatedHref;
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <Button size="lg" asChild>
-        <Link href={href}>Get Started</Link>
+    <div className={`flex flex-col items-center gap-4 ${className || ""}`}>
+      <Button size={size} variant={variant} asChild>
+        <Link href={href}>{text}</Link>
       </Button>
 
-      {session && (
+      {session && showWelcomeMessage && (
         <p className="flex items-center gap-2">
           <span
             data-role={session.user.role}
