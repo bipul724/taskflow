@@ -3,8 +3,18 @@
 import Link from 'next/link'
 import { LayoutGrid, FileText, Users, Settings, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { usePathname } from 'next/navigation'
 
 export function DashboardSidebar() {
+  const pathname = usePathname()
+
+  const navItems = [
+    { name: 'Boards', href: '/dashboard', icon: LayoutGrid },
+    { name: 'Templates', href: '/templates', icon: FileText },
+    { name: 'Members', href: '/members', icon: Users },
+    { name: 'Settings', href: '/settings', icon: Settings },
+  ]
+
   return (
     <div className="w-64 bg-[#1a1a1a] border-r border-[#333333] flex flex-col min-h-screen">
       {/* Logo */}
@@ -26,34 +36,23 @@ export function DashboardSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        <Link
-          href="/dashboard"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#2a2a2a] text-white hover:bg-[#333333] transition"
-        >
-          <LayoutGrid size={20} />
-          <span className="text-sm font-medium">Boards</span>
-        </Link>
-        <Link
-          href="/templates"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-[#2a2a2a] transition"
-        >
-          <FileText size={20} />
-          <span className="text-sm font-medium">Templates</span>
-        </Link>
-        <Link
-          href="/members"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-[#2a2a2a] transition"
-        >
-          <Users size={20} />
-          <span className="text-sm font-medium">Members</span>
-        </Link>
-        <Link
-          href="/settings"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-[#2a2a2a] transition"
-        >
-          <Settings size={20} />
-          <span className="text-sm font-medium">Settings</span>
-        </Link>
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition ${isActive
+                  ? 'bg-[#2a2a2a] text-white'
+                  : 'text-gray-400 hover:bg-[#2a2a2a]'
+                }`}
+            >
+              <item.icon size={20} />
+              <span className="text-sm font-medium">{item.name}</span>
+            </Link>
+          )
+        })}
       </nav>
 
       {/* Footer */}

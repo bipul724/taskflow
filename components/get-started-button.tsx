@@ -25,10 +25,10 @@ export const GetStartedButton = ({
 
   if (isPending) {
     return (
-      <Button 
-        size={size} 
-        variant={variant} 
-        className={`opacity-50 ${className || ""}`} 
+      <Button
+        size={size}
+        variant={variant}
+        className={`opacity-50 ${className || ""}`}
         asChild
       >
         <span>{text}</span>
@@ -36,17 +36,17 @@ export const GetStartedButton = ({
     );
   }
 
-  const href = session ? "/profile" : unauthenticatedHref;
+  const href = session ? "/dashboard" : unauthenticatedHref;
 
   return (
     // 1. Remove className from the outer div
     <div className="flex flex-col items-center gap-4">
-      <Button 
-        size={size} 
-        variant={variant} 
+      <Button
+        size={size}
+        variant={variant}
         asChild
         // 2. Apply className here so border-radius affects the button
-        className={className} 
+        className={className}
       >
         <Link href={href}>{text}</Link>
       </Button>

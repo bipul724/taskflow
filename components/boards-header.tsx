@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 export function BoardsHeader() {
   return (
-    <div className="flex items-center justify-between p-6 border-b border-[#333333]">
+    <div className="flex items-center justify-between px-6 py-5 border-b border-[#333333]">
       <h1 className="text-3xl font-bold text-white">Boards</h1>
       <div className="flex gap-3">
         <Button
