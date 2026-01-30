@@ -40,7 +40,8 @@ export function Header() {
             <GetStartedButton
               text="Get started"
               size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 flex-row"
+              // CHANGED: Use 'rounded-xl' to match the screenshot curvature
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl"
               showWelcomeMessage={false}
             />
           </div>
