@@ -41,9 +41,10 @@ export default function BillingSettingsPage() {
                             <p className="text-sm text-gray-500">View and manage your billing and subscription.</p>
                         </div>
 
-                        <Button className="bg-white text-black hover:bg-gray-200 gap-2 font-medium">
-                            Billing portal
-                            <ExternalLink size={14} />
+                        <Button asChild className="bg-white text-black hover:bg-gray-200 gap-2 font-medium">
+                            <Link href="/pricing">
+                                Billing portal
+                            </Link>
                         </Button>
                     </div>
                 </div>

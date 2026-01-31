@@ -11,7 +11,7 @@ import { ac, roles } from "@/lib/permissions";
 import { sendEmailAction } from "@/actions/send-email.action";
 
 const options = {
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 
   database: prismaAdapter(prisma, {
     provider: "postgresql",

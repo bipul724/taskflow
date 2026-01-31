@@ -9,8 +9,12 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ==============================
+// 1. AUTHENTICATION & USER
+// ==============================
+
 model User {
-  id            String    @id @default(cuid()) // Added default for safety
+  id            String    @id @default(cuid())
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   name          String
@@ -24,10 +28,15 @@ model User {
 
   // Relations
   accounts      Account[]
-  posts         Post[]
   sessions      Session[]
+  
+  // App Relations
+  posts         Post[]    
+  orgMemberships OrgMembership[] 
+  cards         Card[]    
+  auditLogs     AuditLog[] 
 
-  @@map("users") // Maps to your existing "users" table
+  @@map("users")
 }
 
 model Account {
@@ -44,10 +53,9 @@ model Account {
   scope                 String?
   password              String?
   userId                String
-  
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("accounts") // Maps to "accounts" table
+  @@map("accounts")
 }
 
 model Session {
@@ -60,10 +68,9 @@ model Session {
   userAgent      String?
   impersonatedBy String?
   userId         String
-  
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("sessions") // Maps to "sessions" table
+  @@map("sessions")
 }
 
 model Verification {
@@ -74,8 +81,152 @@ model Verification {
   value      String
   expiresAt  DateTime
 
-  @@map("verifications") // Maps to "verifications" table
+  @@map("verifications")
 }
+
+// ==============================
+// 2. TASKFLOW CORE ENTITIES
+// ==============================
+
+model Workspace {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  name      String
+  slug      String   @unique 
+  logo      String?
+
+  // Relations
+  members       OrgMembership[]
+  boards        Board[]
+  
+  // Limits (Optional: remove if you don't want to track usage at all)
+  limit         OrgLimit?
+
+  @@map("workspaces")
+}
+
+model OrgMembership {
+  id          String    @id @default(cuid())
+  role        OrgRole   @default(MEMBER)
+  
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId]) 
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("org_memberships")
+}
+
+model Board {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  title         String
+  workspaceId   String
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Visuals
+  imageId       String
+  imageThumbUrl String   @db.Text
+  imageFullUrl  String   @db.Text
+  imageUserName String   @db.Text
+  imageLinkHTML String   @db.Text
+
+  lists         List[]
+
+  @@index([workspaceId])
+  @@map("boards")
+}
+
+model List {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  title     String
+  order     Int      
+  
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  cards     Card[]
+
+  @@index([boardId])
+  @@map("lists")
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  title       String
+  description String?  @db.Text
+  order       Int      
+  
+  listId      String
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  
+  assignedToId String?
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id])
+
+  @@index([listId])
+  @@map("cards")
+}
+
+// ==============================
+// 3. AUDIT LOGS
+// ==============================
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  
+  action      ACTION
+  entityId    String
+  entityType  ENTITY_TYPE
+  entityTitle String
+  
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  userImage   String      @db.Text
+  userName    String      @db.Text
+  
+  orgId       String      
+
+  @@index([orgId])
+  @@index([entityId])
+  @@map("audit_logs")
+}
+
+// ==============================
+// 4. LIMITS (Internal usage tracking)
+// ==============================
+
+model OrgLimit {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  count       Int       @default(0) 
+  
+  workspaceId String    @unique
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("org_limits")
+}
+
+// ==============================
+// 5. MISC & ENUMS
+// ==============================
 
 model Post {
   id        String   @id @default(cuid())
@@ -84,13 +235,29 @@ model Post {
   title     String
   content   String
   userId    String
-  
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("posts") // Maps to "posts" table
+  @@map("posts")
 }
 
 enum UserRole {
   USER
   ADMIN
+}
+
+enum OrgRole {
+  ADMIN
+  MEMBER
+}
+
+enum ACTION {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum ENTITY_TYPE {
+  BOARD
+  LIST
+  CARD
 }
