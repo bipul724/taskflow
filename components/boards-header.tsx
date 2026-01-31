@@ -2,6 +2,7 @@
 
 import { Download, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { FormPopover } from '@/components/form/form-popover'
 
 export function BoardsHeader() {
   return (
@@ -15,10 +16,12 @@ export function BoardsHeader() {
           <Download size={18} />
           Import
         </Button>
-        <Button className="bg-white text-black hover:bg-gray-100 gap-2">
-          <Plus size={18} />
-          New
-        </Button>
+        <FormPopover sideOffset={10} side="bottom">
+          <Button className="bg-white text-black hover:bg-gray-100 gap-2">
+            <Plus size={18} />
+            New
+          </Button>
+        </FormPopover>
       </div>
     </div>
   )
