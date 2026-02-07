@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
-import { useState, useRef, ElementRef } from "react";
+import { useState, useRef, ElementRef, RefObject } from "react";
 import { useEventListener, useOnClickOutside } from "usehooks-ts";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -17,8 +17,8 @@ export const ListForm = ({
     boardId: string;
 }) => {
     const router = useRouter();
-    const formRef = useRef<ElementRef<"form">>(null);
-    const inputRef = useRef<ElementRef<"input">>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -40,7 +40,7 @@ export const ListForm = ({
     };
 
     useEventListener("keydown", onKeyDown);
-    useOnClickOutside(formRef, disableEditing);
+    useOnClickOutside(formRef as RefObject<HTMLElement>, disableEditing);
 
     const onSubmit = async (formData: FormData) => {
         const title = formData.get("title") as string;

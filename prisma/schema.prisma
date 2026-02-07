@@ -5,8 +5,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  url       = env("DATABASE_URL")  
 }
 
 // ==============================
@@ -171,6 +170,11 @@ model Card {
   description String?  @db.Text
   order       Int      
   
+  // New fields for task management
+  status      CardStatus  @default(PENDING)
+  priority    CardPriority?
+  dueDate     DateTime?
+  
   listId      String
   list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
   
@@ -260,4 +264,15 @@ enum ENTITY_TYPE {
   BOARD
   LIST
   CARD
+}
+
+enum CardStatus {
+  PENDING
+  COMPLETED
+}
+
+enum CardPriority {
+  HIGH
+  MODERATE
+  LOW
 }

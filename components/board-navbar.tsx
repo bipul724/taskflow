@@ -1,13 +1,14 @@
 import { Board } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { CreateListPopover } from "@/components/form/create-list-popover";
+import { DeleteBoardButton } from "@/components/delete-board-button";
 import { Filter, Eye } from "lucide-react";
 
 interface BoardNavbarProps {
     data: Board;
 }
 
-export const BoardNavbar = async ({ data }: BoardNavbarProps) => {
+export const BoardNavbar = ({ data }: BoardNavbarProps) => {
     return (
         <div className="w-full h-14 z-[40] bg-black/40 backdrop-blur-sm fixed top-14 flex items-center justify-between pl-6 pr-72 gap-x-4 text-white">
             <div className="flex items-center gap-x-4 shrink-0">
@@ -41,6 +42,9 @@ export const BoardNavbar = async ({ data }: BoardNavbarProps) => {
                         + New list
                     </Button>
                 </CreateListPopover>
+
+                {/* Delete Board Button */}
+                <DeleteBoardButton boardId={data.id} />
             </div>
         </div>
     );

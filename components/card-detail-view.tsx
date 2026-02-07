@@ -3,10 +3,10 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { MoreHorizontal, Plus, Paperclip, CheckCircle, Pencil, ArrowLeft } from "lucide-react";
+import { MoreHorizontal, Plus, Paperclip, CheckCircle, Pencil, ArrowLeft, Circle, Calendar, Check } from "lucide-react";
 import { toast } from "sonner";
 
-import { Card } from "@/lib/generated/prisma";
+import { Card, CardStatus, CardPriority } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { updateCard } from "@/actions/update-card";
 
@@ -17,15 +17,32 @@ interface CardDetailViewProps {
     boardId: string;
 }
 
+// Priority colors
+const priorityConfig = {
+    HIGH: { label: "High", color: "bg-red-500", textColor: "text-red-500" },
+    MODERATE: { label: "Moderate", color: "bg-orange-500", textColor: "text-orange-500" },
+    LOW: { label: "Low", color: "bg-green-500", textColor: "text-green-500" },
+};
+
 export const CardDetailView = ({ card, listTitle, boardTitle, boardId }: CardDetailViewProps) => {
     const router = useRouter();
     const [title, setTitle] = useState(card.title);
     const [description, setDescription] = useState(card.description || "");
+    const [status, setStatus] = useState<CardStatus>(card.status);
+    const [priority, setPriority] = useState<CardPriority | null>(card.priority);
+    const [dueDate, setDueDate] = useState<string>(
+        card.dueDate ? new Date(card.dueDate).toISOString().split("T")[0] : ""
+    );
     const [isPending, startTransition] = useTransition();
+
+    // Dropdown states
+    const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+    const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const handleTitleBlur = () => {
         if (title.trim() === "") {
-            setTitle(card.title); // Reset to original if empty
+            setTitle(card.title);
             return;
         }
 
@@ -39,7 +56,7 @@ export const CardDetailView = ({ card, listTitle, boardTitle, boardId }: CardDet
 
                 if (result.error) {
                     toast.error(result.error);
-                    setTitle(card.title); // Reset on error
+                    setTitle(card.title);
                 } else {
                     toast.success("Card title updated!");
                     router.refresh();
@@ -66,6 +83,66 @@ export const CardDetailView = ({ card, listTitle, boardTitle, boardId }: CardDet
                 }
             });
         }
+    };
+
+    const handleStatusChange = (newStatus: CardStatus) => {
+        setStatus(newStatus);
+        setShowStatusDropdown(false);
+        startTransition(async () => {
+            const result = await updateCard({
+                cardId: card.id,
+                boardId,
+                status: newStatus,
+            });
+
+            if (result.error) {
+                toast.error(result.error);
+                setStatus(card.status);
+            } else {
+                toast.success("Status updated!");
+                router.refresh();
+            }
+        });
+    };
+
+    const handlePriorityChange = (newPriority: CardPriority | null) => {
+        setPriority(newPriority);
+        setShowPriorityDropdown(false);
+        startTransition(async () => {
+            const result = await updateCard({
+                cardId: card.id,
+                boardId,
+                priority: newPriority,
+            });
+
+            if (result.error) {
+                toast.error(result.error);
+                setPriority(card.priority);
+            } else {
+                toast.success("Priority updated!");
+                router.refresh();
+            }
+        });
+    };
+
+    const handleDueDateChange = (dateString: string) => {
+        setDueDate(dateString);
+        setShowDatePicker(false);
+        startTransition(async () => {
+            const result = await updateCard({
+                cardId: card.id,
+                boardId,
+                dueDate: dateString || null,
+            });
+
+            if (result.error) {
+                toast.error(result.error);
+                setDueDate(card.dueDate ? new Date(card.dueDate).toISOString().split("T")[0] : "");
+            } else {
+                toast.success("Due date updated!");
+                router.refresh();
+            }
+        });
     };
 
     return (
@@ -197,20 +274,150 @@ export const CardDetailView = ({ card, listTitle, boardTitle, boardId }: CardDet
                         <p className="text-sm text-white">{listTitle}</p>
                     </div>
 
-                    {/* Labels */}
-                    <div className="space-y-2">
-                        <span className="text-xs text-neutral-500">Labels</span>
+                    {/* Status */}
+                    <div className="space-y-2 relative">
+                        <span className="text-xs text-neutral-500">Status</span>
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="w-full justify-start text-white/70 hover:text-white hover:bg-neutral-800 px-0 h-auto py-1"
+                            onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                            disabled={isPending}
+                            className="w-full justify-start text-white hover:bg-neutral-800 px-2 h-auto py-1.5"
                         >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add label
+                            {status === "COMPLETED" ? (
+                                <Check className="h-4 w-4 mr-2 text-green-500" />
+                            ) : (
+                                <Circle className="h-4 w-4 mr-2 text-yellow-500" />
+                            )}
+                            {status === "COMPLETED" ? "Completed" : "Pending"}
                         </Button>
+
+                        {showStatusDropdown && (
+                            <div className="absolute z-10 top-full left-0 mt-1 w-full bg-neutral-900 border border-neutral-700 rounded-lg shadow-lg overflow-hidden">
+                                <button
+                                    onClick={() => handleStatusChange("PENDING")}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-800 text-sm text-left"
+                                >
+                                    <Circle className="h-4 w-4 text-yellow-500" />
+                                    Pending
+                                </button>
+                                <button
+                                    onClick={() => handleStatusChange("COMPLETED")}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-800 text-sm text-left"
+                                >
+                                    <Check className="h-4 w-4 text-green-500" />
+                                    Completed
+                                </button>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Members */}
+                    {/* Priority */}
+                    <div className="space-y-2 relative">
+                        <span className="text-xs text-neutral-500">Priority</span>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
+                            disabled={isPending}
+                            className="w-full justify-start text-white hover:bg-neutral-800 px-2 h-auto py-1.5"
+                        >
+                            {priority ? (
+                                <>
+                                    <span className={`h-3 w-3 rounded-full ${priorityConfig[priority].color} mr-2`} />
+                                    {priorityConfig[priority].label}
+                                </>
+                            ) : (
+                                <>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Set priority
+                                </>
+                            )}
+                        </Button>
+
+                        {showPriorityDropdown && (
+                            <div className="absolute z-10 top-full left-0 mt-1 w-full bg-neutral-900 border border-neutral-700 rounded-lg shadow-lg overflow-hidden">
+                                <button
+                                    onClick={() => handlePriorityChange("HIGH")}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-800 text-sm text-left"
+                                >
+                                    <span className="h-3 w-3 rounded-full bg-red-500" />
+                                    High
+                                </button>
+                                <button
+                                    onClick={() => handlePriorityChange("MODERATE")}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-800 text-sm text-left"
+                                >
+                                    <span className="h-3 w-3 rounded-full bg-orange-500" />
+                                    Moderate
+                                </button>
+                                <button
+                                    onClick={() => handlePriorityChange("LOW")}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-800 text-sm text-left"
+                                >
+                                    <span className="h-3 w-3 rounded-full bg-green-500" />
+                                    Low
+                                </button>
+                                {priority && (
+                                    <button
+                                        onClick={() => handlePriorityChange(null)}
+                                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-800 text-sm text-left text-neutral-400 border-t border-neutral-700"
+                                    >
+                                        Clear priority
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Due date */}
+                    <div className="space-y-2 relative">
+                        <span className="text-xs text-neutral-500">Due date</span>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                            disabled={isPending}
+                            className="w-full justify-start text-white hover:bg-neutral-800 px-2 h-auto py-1.5"
+                        >
+                            {dueDate ? (
+                                <>
+                                    <Calendar className="h-4 w-4 mr-2 text-blue-400" />
+                                    {new Date(dueDate).toLocaleDateString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                    })}
+                                </>
+                            ) : (
+                                <>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Set due date
+                                </>
+                            )}
+                        </Button>
+
+                        {showDatePicker && (
+                            <div className="absolute z-10 top-full left-0 mt-1 w-full bg-neutral-900 border border-neutral-700 rounded-lg shadow-lg p-3">
+                                <input
+                                    type="date"
+                                    value={dueDate}
+                                    onChange={(e) => handleDueDateChange(e.target.value)}
+                                    className="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-sm text-white outline-none focus:border-neutral-600"
+                                />
+                                {dueDate && (
+                                    <button
+                                        onClick={() => handleDueDateChange("")}
+                                        className="w-full mt-2 text-sm text-neutral-400 hover:text-white py-1"
+                                    >
+                                        Clear due date
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Members (placeholder for now) */}
                     <div className="space-y-2">
                         <span className="text-xs text-neutral-500">Members</span>
                         <Button
@@ -223,16 +430,16 @@ export const CardDetailView = ({ card, listTitle, boardTitle, boardId }: CardDet
                         </Button>
                     </div>
 
-                    {/* Due date */}
+                    {/* Labels (placeholder for now) */}
                     <div className="space-y-2">
-                        <span className="text-xs text-neutral-500">Due date</span>
+                        <span className="text-xs text-neutral-500">Labels</span>
                         <Button
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-white/70 hover:text-white hover:bg-neutral-800 px-0 h-auto py-1"
                         >
                             <Plus className="h-4 w-4 mr-2" />
-                            Set due date
+                            Add label
                         </Button>
                     </div>
                 </div>
@@ -240,3 +447,4 @@ export const CardDetailView = ({ card, listTitle, boardTitle, boardId }: CardDet
         </div>
     );
 };
+

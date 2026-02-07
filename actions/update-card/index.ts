@@ -12,6 +12,10 @@ const UpdateCardSchema = z.object({
     boardId: z.string(),
     title: z.string().min(1, "Title is required").optional(),
     description: z.string().optional(),
+    status: z.enum(["PENDING", "COMPLETED"]).optional(),
+    priority: z.enum(["HIGH", "MODERATE", "LOW"]).nullable().optional(),
+    dueDate: z.string().nullable().optional(), // ISO date string
+    assignedToId: z.string().nullable().optional(),
 });
 
 export type UpdateCardInput = z.infer<typeof UpdateCardSchema>;
@@ -36,7 +40,14 @@ export const updateCard = async (data: UpdateCardInput): Promise<UpdateCardRetur
         return { error: validatedFields.error.errors[0]?.message || "Invalid fields" };
     }
 
-    const { cardId, boardId, title, description } = validatedFields.data;
+    const { cardId,
+        boardId,
+        title,
+        description,
+        status,
+        priority,
+        dueDate,
+        assignedToId } = validatedFields.data;
 
     let card: Card;
 
@@ -56,6 +67,10 @@ export const updateCard = async (data: UpdateCardInput): Promise<UpdateCardRetur
             data: {
                 ...(title !== undefined && { title }),
                 ...(description !== undefined && { description }),
+                ...(status !== undefined && { status }),
+                ...(priority !== undefined && { priority }),
+                ...(dueDate !== undefined && { dueDate: dueDate ? new Date(dueDate) : null }),
+                ...(assignedToId !== undefined && { assignedToId }),
             },
         });
 

@@ -5,6 +5,17 @@ import { APIError } from "better-auth/api";
 import { headers } from "next/headers";
 
 export async function changePasswordAction(formData: FormData) {
+
+  const headersList = await headers();
+
+  const session = await auth.api.getSession({
+    headers : headersList,
+  });
+
+  if(!session){
+    return {error : "Unauthorized"};
+  }
+
   const currentPassword = String(formData.get("currentPassword"));
   if (!currentPassword) return { error: "Please enter your current password" };
 
@@ -13,7 +24,7 @@ export async function changePasswordAction(formData: FormData) {
 
   try {
     await auth.api.changePassword({
-      headers: await headers(),
+      headers: headersList,
       body: {
         currentPassword,
         newPassword,

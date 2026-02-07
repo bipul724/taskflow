@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea"; // Assuming we have or can use standard textarea styling
+
 import { toast } from "sonner";
 import { Zap } from "lucide-react";
 
@@ -84,22 +84,7 @@ export function WorkspaceSettingsForm() {
                     </Button>
                 </div>
 
-                {/* Save Changes Button (Hidden in screenshot but typically needed, sticking to screenshot which only implies updates or maybe 'Upgrade' is the only action? 
-           Actually the screenshot shows inputs which implies they are editable. 
-           Usually there is a Save button. 
-           However, sticking STRICTLY to the screenshot, there is NO Save button visible for the form fields, only "Upgrade to Pro" 
-           and then "Delete workspace".
-           Maybe it auto-saves? Or the screenshot is cut off?
-           I will add a Save button typically, or maybe the inputs blur-save?
-           Wait, looking at the previous settings page screenshot, there WAS a "Save Changes" button. 
-           This screenshot does NOT show one. 
-           It might be below the fold or implied. 
-           I'll add a "Update Workspace" button for usability, or just let the "Upgrade" button be the prominent one
-           and rely on 'Enter' to submit since I wrapped it in a <form>.
-           Actually, I'll add a 'Save Changes' button because it's standard UX, even if not explicitly in the partial screenshot.
-           BUT, looking closely, the "Upgrade to Pro" is in the flow.
-           I'll add a generic 'Save' button.
-        */}
+
                 <div className="pt-2">
                     <Button disabled={isPending} className="bg-white text-black hover:bg-gray-200">
                         Update Workspace

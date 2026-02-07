@@ -2,7 +2,7 @@ import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { createAuthMiddleware, APIError } from "better-auth/api";
-import { admin, customSession, magicLink } from "better-auth/plugins";
+import { admin, customSession, magicLink, organization } from "better-auth/plugins";
 
 import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/argon2";
@@ -143,6 +143,7 @@ const options = {
   },
   plugins: [
     nextCookies(),
+    organization(),
     admin({
       defaultRole: "USER",
       adminRoles: ["ADMIN"],
