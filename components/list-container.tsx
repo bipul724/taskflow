@@ -2,11 +2,12 @@
 
 import { List, Card } from "@/lib/generated/prisma";
 import { ListItem } from "./list-item";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { updateListOrder } from "@/actions/update-list-order";
 import { updateCardOrder } from "@/actions/update-card-order";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 type ListWithCards = List & { cards: Card[] };
 
@@ -19,6 +20,11 @@ export const ListContainer = ({
     data,
     boardId,
 }: ListContainerProps) => {
+    const searchParams = useSearchParams();
+    const cardQuery = searchParams.get("cardQuery")?.toLowerCase();
+    const statusFilter = searchParams.get("status");
+    const priorityFilter = searchParams.get("priority");
+
     const [orderedData, setOrderedData] = useState(data);
     const [isMounted, setIsMounted] = useState(false);
 
@@ -30,9 +36,31 @@ export const ListContainer = ({
         setOrderedData(data);
     }, [data]);
 
+    const filteredData = useMemo(() => {
+        if (!cardQuery && !statusFilter && !priorityFilter) return orderedData;
+
+        return orderedData.map((list) => ({
+            ...list,
+            cards: list.cards.filter((card) => {
+                const matchesQuery = !cardQuery || card.title.toLowerCase().includes(cardQuery) || card.description?.toLowerCase().includes(cardQuery);
+                const matchesStatus = !statusFilter || card.status === statusFilter;
+                const matchesPriority = !priorityFilter || card.priority === priorityFilter;
+
+                return matchesQuery && matchesStatus && matchesPriority;
+            }),
+        }));
+    }, [orderedData, cardQuery, statusFilter, priorityFilter]);
+
     if (!isMounted) return null;
 
+    const isFiltering = !!(cardQuery || statusFilter || priorityFilter);
+
     const onDragEnd = (result: any) => {
+        if (isFiltering && result.type === "card") {
+            toast.error("Drag and drop is disabled while filters are active.");
+            return;
+        }
+
         const { destination, source, type } = result;
 
         if (!destination) {
@@ -140,7 +168,7 @@ export const ListContainer = ({
                         ref={provided.innerRef}
                         className="flex gap-x-3 h-full"
                     >
-                        {orderedData.map((list, index) => {
+                        {filteredData.map((list, index) => {
                             return (
                                 <ListItem
                                     key={list.id}

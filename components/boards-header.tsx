@@ -1,13 +1,49 @@
 'use client'
 
-import { Download, Plus } from 'lucide-react'
+import { Download, Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FormPopover } from '@/components/form/form-popover'
+import { Input } from '@/components/ui/input'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useTransition } from 'react'
 
-export function BoardsHeader() {
+import { MAX_FREE_BOARDS } from '@/lib/org-limit'
+
+export function BoardsHeader({ boardCount = 0 }: { boardCount?: number }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+
+  const handleSearch = (term: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+    startTransition(() => {
+        router.replace(`${pathname}?${params.toString()}`);
+    });
+  }
+
   return (
     <div className="flex items-center justify-between px-6 py-5 border-b border-[#333333]">
-      <h1 className="text-3xl font-bold text-white">Boards</h1>
+      <div className="flex items-center gap-4 flex-1">
+        <div className="flex flex-col">
+          <h1 className="text-3xl font-bold text-white leading-tight">Boards</h1>
+          <span className="text-xs text-gray-500 font-medium">{boardCount} / {MAX_FREE_BOARDS} boards used</span>
+        </div>
+        <div className="relative max-w-sm w-full ml-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <Input 
+            placeholder="Search boards..." 
+            className="pl-10 bg-[#1a1a1a] border-[#333333] text-white focus:ring-0 focus:border-gray-500 h-9"
+            defaultValue={searchParams.get('query')?.toString()}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+      </div>
       <div className="flex gap-3">
         <Button
           variant="outline"

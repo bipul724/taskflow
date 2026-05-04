@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { CreateBoardSchema } from "./schema";
 import { InputType, ReturnType } from "./types";
+import { hasAvailableCount } from "@/lib/org-limit";
 
 export const createBoard = async (data: InputType): Promise<ReturnType> => {
     const headersList = await headers();
@@ -21,8 +22,7 @@ export const createBoard = async (data: InputType): Promise<ReturnType> => {
 
     const { title, image } = data;
 
-    // Split the image string into its components
-    // Format: id|thumbUrl|fullUrl|userName|userLinkHtml
+    // ... (rest of image processing)
     const [
         imageId,
         imageThumbUrl,
@@ -41,7 +41,6 @@ export const createBoard = async (data: InputType): Promise<ReturnType> => {
 
     try {
         // 1. Ensure user has a workspace. For now, we'll try to find one or create a personal one.
-        // We will look for an OrgMembership.
         const membership = await prisma.orgMembership.findFirst({
             where: { userId: session.user.id },
             include: { workspace: true }
@@ -49,8 +48,6 @@ export const createBoard = async (data: InputType): Promise<ReturnType> => {
 
         let workspaceId = membership?.workspaceId;
 
-        // If no workspace, create a default "Personal Workspace"
-        // In a real app, you might force them to create one during onboarding.
         if (!workspaceId) {
             const workspace = await prisma.workspace.create({
                 data: {
@@ -65,6 +62,14 @@ export const createBoard = async (data: InputType): Promise<ReturnType> => {
                 }
             });
             workspaceId = workspace.id;
+        }
+
+        const canCreate = await hasAvailableCount(workspaceId);
+
+        if (!canCreate) {
+            return {
+                error: "You have reached your limit of free boards. Please upgrade your plan to create more."
+            };
         }
 
         board = await prisma.board.create({
