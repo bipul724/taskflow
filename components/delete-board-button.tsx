@@ -45,8 +45,8 @@ export const DeleteBoardButton = ({ boardId }: DeleteBoardButtonProps) => {
             size="sm"
             className="bg-red-500/80 hover:bg-red-600 text-white shrink-0"
         >
-            <Trash2 className="h-4 w-4 mr-2" />
-            {isLoading ? "Deleting..." : "Delete Board"}
+            <Trash2 className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">{isLoading ? "Deleting..." : "Delete Board"}</span>
         </Button>
     );
 };

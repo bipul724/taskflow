@@ -50,9 +50,9 @@ export const BoardNavbar = ({ data }: BoardNavbarProps) => {
     const hasFilters = searchParams.get('cardQuery') || searchParams.get('status') || searchParams.get('priority');
 
     return (
-        <div className="h-14 z-[40] bg-black/40 backdrop-blur-sm fixed top-0 left-64 right-0 flex items-center justify-between pl-6 pr-6 gap-x-4 text-white">
-            <div className="flex items-center gap-x-4 shrink-0">
-                <div className="font-bold text-lg whitespace-nowrap">
+        <div className="h-14 z-[40] bg-black/40 backdrop-blur-sm fixed top-0 left-0 md:left-64 right-0 flex items-center justify-between pl-14 md:pl-6 pr-4 md:pr-6 gap-x-2 md:gap-x-4 text-white">
+            <div className="flex items-center gap-x-2 md:gap-x-4 shrink-0 min-w-0">
+                <div className="font-bold text-base md:text-lg whitespace-nowrap truncate max-w-[120px] md:max-w-none">
                     {data.title}
                 </div>
                 
@@ -77,8 +77,8 @@ export const BoardNavbar = ({ data }: BoardNavbarProps) => {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className={`bg-white/10 hover:bg-white/20 text-white shrink-0 ${hasFilters ? 'border-sky-500 border' : ''}`}>
-                            <Filter className="h-4 w-4 mr-2" />
-                            Filter
+                            <Filter className="h-4 w-4 md:mr-2" />
+                            <span className="hidden md:inline">Filter</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-[#333333] text-white">
@@ -114,11 +114,12 @@ export const BoardNavbar = ({ data }: BoardNavbarProps) => {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                <div className="w-px h-6 bg-white/20 mx-2" />
+                <div className="w-px h-6 bg-white/20 mx-1 md:mx-2 hidden sm:block" />
 
                 <CreateListPopover boardId={data.id}>
-                    <Button size="sm" className="bg-white text-black hover:bg-white/90 shrink-0">
-                        + New list
+                    <Button size="sm" className="bg-white text-black hover:bg-white/90 shrink-0 px-2 md:px-3">
+                        <span className="md:hidden">+</span>
+                        <span className="hidden md:inline">+ New list</span>
                     </Button>
                 </CreateListPopover>
 

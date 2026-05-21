@@ -166,7 +166,7 @@ export const ListContainer = ({
                     <ol 
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className="flex gap-x-3 h-full"
+                        className="flex flex-col md:flex-row gap-y-3 md:gap-y-0 md:gap-x-3 h-auto md:h-full"
                     >
                         {filteredData.map((list, index) => {
                             return (

@@ -7,14 +7,14 @@ export default function MembersPage() {
         <div className="flex min-h-screen bg-[#0a0a0a]">
             <DashboardSidebar />
             <div className="flex-1 flex flex-col">
-                <div className="flex-1 pt-14 pb-8 pr-8 pl-28 text-white max-w-5xl">
-                    <div className="flex items-center justify-between mb-8">
+                <div className="flex-1 pt-16 md:pt-14 pb-8 px-4 md:pr-8 md:pl-28 text-white max-w-5xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                         <div className="flex items-center gap-4">
                             <h1 className="text-2xl font-bold">Members</h1>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                             {/* Launch offer badge */}
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0d2a1f] border border-[#1a4d33] text-[#34d399] text-xs font-medium">
+                            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0d2a1f] border border-[#1a4d33] text-[#34d399] text-xs font-medium">
                                 <Zap size={12} className="fill-[#34d399]" />
                                 Launch offer: Get unlimited members with Pro
                             </div>

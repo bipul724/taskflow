@@ -7,7 +7,7 @@ export default function TemplatesPage() {
         <div className="flex min-h-screen bg-[#0a0a0a]">
             <DashboardSidebar />
             <div className="flex-1 flex flex-col">
-                <div className="flex-1 pt-14 pb-8 pr-8 pl-28 text-white max-w-5xl h-full flex flex-col">
+                <div className="flex-1 pt-16 md:pt-14 pb-8 px-4 md:pr-8 md:pl-28 text-white max-w-5xl h-full flex flex-col">
                     <div className="flex items-center justify-between mb-8">
                         <h1 className="text-2xl font-bold">Templates</h1>
                         <Button className="bg-white text-black hover:bg-gray-200 gap-2 font-medium h-9">

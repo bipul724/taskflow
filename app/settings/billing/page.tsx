@@ -16,11 +16,11 @@ export default function BillingSettingsPage() {
         <div className="flex min-h-screen bg-[#0a0a0a]">
             <DashboardSidebar />
             <div className="flex-1 flex flex-col">
-                <div className="flex-1 pt-14 pb-8 pr-8 pl-28 text-white max-w-4xl">
+                <div className="flex-1 pt-16 md:pt-14 pb-8 px-4 md:pr-8 md:pl-28 text-white max-w-4xl">
                     <h1 className="text-2xl font-bold mb-6">Settings</h1>
 
                     {/* Tabs */}
-                    <div className="flex border-b border-[#333333] mb-8">
+                    <div className="flex border-b border-[#333333] mb-8 overflow-x-auto">
                         {tabs.map((tab) => (
                             <Link
                                 key={tab.name}
