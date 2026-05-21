@@ -64,7 +64,7 @@ const BoardIdPage = async (props: BoardIdPageProps) => {
                     {/* Overlay - only on content area */}
                     <div className="absolute inset-0 bg-black/10 pointer-events-none" />
                     <BoardNavbar data={board} />
-                    <main className="relative flex-1 overflow-x-auto overflow-y-hidden pt-36 pb-10 px-6">
+                    <main className="relative flex-1 overflow-x-auto overflow-y-hidden pt-20 pb-10 px-6">
                         <ListContainer
                             boardId={boardId}
                             data={board.lists}

@@ -50,7 +50,7 @@ export const BoardNavbar = ({ data }: BoardNavbarProps) => {
     const hasFilters = searchParams.get('cardQuery') || searchParams.get('status') || searchParams.get('priority');
 
     return (
-        <div className="w-full h-14 z-[40] bg-black/40 backdrop-blur-sm fixed top-14 flex items-center justify-between pl-6 pr-6 gap-x-4 text-white">
+        <div className="h-14 z-[40] bg-black/40 backdrop-blur-sm fixed top-0 left-64 right-0 flex items-center justify-between pl-6 pr-6 gap-x-4 text-white">
             <div className="flex items-center gap-x-4 shrink-0">
                 <div className="font-bold text-lg whitespace-nowrap">
                     {data.title}
