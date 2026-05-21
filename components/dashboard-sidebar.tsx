@@ -43,7 +43,9 @@ export function DashboardSidebar() {
     <div className="w-64 bg-[#1a1a1a] border-r border-[#333333] flex flex-col min-h-screen">
       {/* Logo */}
       <div className="p-6 border-b border-[#333333]">
-        <h1 className="text-xl font-bold text-white">TaskFlow</h1>
+        <Link href="/">
+          <h1 className="text-xl font-bold text-white hover:text-gray-300 transition cursor-pointer">TaskFlow</h1>
+        </Link>
       </div>
 
       {/* User Profile */}
